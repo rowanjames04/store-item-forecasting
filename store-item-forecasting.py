@@ -128,8 +128,6 @@ model = lgb.train(
     callbacks=[lgb.log_evaluation(100)]
 )
 
-lgb_params.pop('early_stopping_rounds', None) 
-
 y_pred_val = model.predict(X_val, num_iteration=model.best_iteration)
 smape(np.expm1(y_pred_val), np.expm1(Y_val))
 
@@ -143,8 +141,11 @@ X_test = test[cols]
 
 lgbtrain_all = lgb.Dataset(data=X_train, label=Y_train, feature_name=cols)
 
+final_params = lgb_params.copy()
+final_params.pop('early_stopping_rounds', None)
+
 final_model = lgb.train(
-    lgb_params,
+    final_params,
     lgbtrain_all,
     num_boost_round=model.best_iteration,
     callbacks=[lgb.log_evaluation(100)]
