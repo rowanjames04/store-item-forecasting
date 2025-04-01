@@ -118,6 +118,7 @@ lgb_params = {
 lgbtrain = lgb.Dataset(data=X_train, label=Y_train, feature_name=cols)
 lgbval = lgb.Dataset(data=X_val, label=Y_val, reference=lgbtrain, feature_name=cols)
 
+
 model = lgb.train(
     lgb_params,
     lgbtrain,
@@ -126,6 +127,8 @@ model = lgb.train(
     feval=lgbm_smape,
     callbacks=[lgb.log_evaluation(100)]
 )
+
+lgb_params.pop('early_stopping_rounds', None) 
 
 y_pred_val = model.predict(X_val, num_iteration=model.best_iteration)
 smape(np.expm1(y_pred_val), np.expm1(Y_val))
@@ -143,7 +146,8 @@ lgbtrain_all = lgb.Dataset(data=X_train, label=Y_train, feature_name=cols)
 final_model = lgb.train(
     lgb_params,
     lgbtrain_all,
-    num_boost_round=model.best_iteration
+    num_boost_round=model.best_iteration,
+    callbacks=[lgb.log_evaluation(100)]
 )
 
 test_preds = final_model.predict(X_test, num_iteration=final_model.best_iteration)
