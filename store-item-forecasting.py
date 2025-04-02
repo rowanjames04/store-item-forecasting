@@ -159,14 +159,54 @@ forecast = pd.DataFrame({
     "item": test["item"],
     "sales": test_preds
 })
+# Plotting - Save to files instead of showing
 
-# Plotting
-forecast[(forecast.store == 1) & (forecast.item == 1)].set_index("date").sales.plot(
-    color="green", figsize=(20,9), legend=True, label="Store 1 Item 1 Forecast")
+# 1. Store 1 Item 1 Forecast (saved to file)
+plt.figure(figsize=(20, 6))
+forecast[(forecast.store == 1) & (forecast.item == 1)] \
+    .set_index("date")["sales"] \
+    .plot(color="green", legend=True, label="Store 1 Item 1 Forecast")
+plt.title("Store 1 Item 1 - Sales Forecast")
+plt.ylabel("Log-Scaled Sales")
+plt.grid(True)
+plt.savefig('store1_item1_forecast.png', dpi=300, bbox_inches='tight')
+plt.close()  # Important: closes the figure to free memory
 
-train[(train.store == 1) & (train.item == 17)].set_index("date").sales.plot(
-    figsize=(20,9), legend=True, label="Store 1 Item 17 Sales")
-forecast[(forecast.store == 1) & (forecast.item == 17)].set_index("date").sales.plot(
-    legend=True, label="Store 1 Item 17 Forecast")
+# 2. Store 1 Item 17 Comparison (saved to file)
+plt.figure(figsize=(20, 6))
+train[(train.store == 1) & (train.item == 17)] \
+    .set_index("date")["sales"] \
+    .plot(legend=True, label="Actual Sales")
+forecast[(forecast.store == 1) & (forecast.item == 17)] \
+    .set_index("date")["sales"] \
+    .plot(legend=True, label="Forecasted Sales")
+plt.title("Store 1 Item 17 - Actual vs Forecast")
+plt.ylabel("Log-Scaled Sales")
+plt.xlabel("Date")
+plt.grid(True)
+plt.legend()
+plt.savefig('store1_item17_comparison.png', dpi=300, bbox_inches='tight')
+plt.close()  # Important: closes the figure
 
+# Assuming your code has already run and produced the 'forecast' DataFrame
+# which contains 'date', 'store', 'item', and 'sales' (log-scaled predictions)
+
+# 1. Convert predictions back from log scale
+test_preds_exp = np.expm1(test_preds)
+
+# 2. Create output DataFrame with 'id' as int right away
+output = test[['id']].copy().astype(int)  # Cleaner one-step conversion
+output['sales'] = test_preds_exp.clip(lower=0)  # Combine clip with assignment
+
+# 3. Sort & save
+output = output.sort_values('id')
+output_path = os.path.join(script_dir, 'output.csv')  # Changed to output.csv
+output.to_csv(output_path, index=False)
+
+print(f"Output file saved to: {output_path}")
+print(output.head())
+
+print("Plots saved as:")
+print("- store1_item1_forecast.png")
+print("- store1_item17_comparison.png")
 print(df.shape)
