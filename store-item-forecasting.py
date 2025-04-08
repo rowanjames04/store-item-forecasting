@@ -2,16 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-import seaborn as sns
 import lightgbm as lgb
-from statsmodels.tsa.holtwinters import SimpleExpSmoothing
-from sklearn.metrics import mean_absolute_error
-from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from statsmodels.tsa.statespace.sarimax import SARIMAX
-from statsmodels.tsa.arima_model import ARIMA
-from statsmodels.tsa.seasonal import seasonal_decompose
-import statsmodels.api as sm
-import itertools
 import warnings
 
 pd.set_option('display.max_columns', None)
